@@ -1,4 +1,4 @@
-private["_getConfig", "_getDisplayname"];
+private["_getConfig", "_getDisplayname", "_config", "_displayname"];
 
 _getConfig =
 {
@@ -16,20 +16,23 @@ _getConfig =
 _getDisplayname = {
     params["_classname"];
 
-	_config = [_classname] call _getConfig;
-	getText(configFile >> _config >> _className >> "displayName");
+	private _conf = [_classname] call _getConfig;
+	getText(configFile >> _conf >> _className >> "displayName");
 };
 
+
+_config = (configFile >> "CfgVehicles" >> typeOf (vehicle player) >> "Turrets");
 
 if !(isNull objectParent player) then {
 	_object = _this;
 
 	_type = typeOf _object;
+	_displayname =  [_type] call _getDisplayname;
 	x_reload_time_factor = 5.00;
 
 	_object setVehicleAmmo 1;
 
-	_object vehicleChat format ["Servicing %1... Please stand by...", [_type] call _getDisplayname];
+	_object vehicleChat format ["Servicing %1... Please stand by...", _displayname];
 
 	_magazines = getArray(configFile >> "CfgVehicles" >> _type >> "magazines");
 
@@ -70,11 +73,10 @@ if !(isNull objectParent player) then {
 				sleep x_reload_time_factor;
 			} forEach _magazines;
 
-
 			_count_other = count (_config >> "Turrets");
 			if (_count_other > 0) then {
 				for "_i" from 0 to (_count_other - 1) do {
-					_config2 = (_config >> "Turrets") select _i;
+					_config2 = (_more_turrets) select _i;
 					_magazines = getArray(_config2 >> "magazines");
 					_removed = [];
 					{
@@ -105,8 +107,8 @@ if !(isNull objectParent player) then {
 		sleep 0.01;
 	};
 	sleep x_reload_time_factor;
-	_object vehicleChat format ["%1 is ready...", _type];
+	_object vehicleChat format ["%1 is ready...", _displayname];
 
 	if (true) exitWith {};
 
-};
+}
