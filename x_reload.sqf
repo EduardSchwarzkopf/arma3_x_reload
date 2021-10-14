@@ -111,4 +111,4 @@ if !(isNull objectParent player) then {
 
 	if (true) exitWith {};
 
-}
+};
